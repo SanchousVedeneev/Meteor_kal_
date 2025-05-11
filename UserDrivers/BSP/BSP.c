@@ -94,14 +94,12 @@ __weak void bsp_rs485_callback_rxTimeout(uint8_t portNo)
 
 void BSP_RS485_1_IRQ_HANDLER(void)
 {
-  // RX READY
-    if (__HAL_UART_GET_FLAG(&BSP_RS485_1, UART_FLAG_IDLE))
+  
+  if (__HAL_UART_GET_FLAG(&BSP_RS485_1, UART_FLAG_IDLE)) // RX READY
   {
     __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_IDLE);
     __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_RXNE);
-
     asm("NOP");
-
 
   // *            @arg DMA_FLAG_TCIFx: Transfer complete flag.
   // *            @arg DMA_FLAG_HTIFx: Half transfer complete flag.
@@ -109,95 +107,50 @@ void BSP_RS485_1_IRQ_HANDLER(void)
   // *            @arg DMA_FLAG_DMEIFx: Direct mode error flag.
   // *            @arg DMA_FLAG_FEIFx: FIFO error flag.
 
-  //__HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_ORE);// OVERRUN
-
-  // MAIN_LED1_TOGGLE();
-
-  if (BSP_RS485_1.hdmarx->Instance->NDTR !=  260 )
-  {
-    __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_ORE);  // OVERRUN
-    __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_FE);  // OVERRUN
-    __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_PE);  // OVERRUN
-    __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_TXE);  // OVERRUN
-    __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_NE);  // OVERRUN
+    if (BSP_RS485_1.hdmarx->Instance->NDTR !=  260 )
+    {
+      __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_ORE);  // OVERRUN
+      __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_FE);  // OVERRUN
+      __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_PE);  // OVERRUN
+      __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_TXE);  // OVERRUN
+      __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_NE);  // OVERRUN
 
     BSP_RS485_1.Instance->CR3 &= ~USART_CR3_DMAR;
 
-   // __HAL_DMA_DISABLE(BSP_RS485_1.hdmarx); // BLOCK READY
-
-  HAL_UART_Abort(&BSP_RS485_1);
-
+    HAL_UART_Abort(&BSP_RS485_1);
 
     bsp_rs485_callback_rxBlockReady(1);
-    // bsp_dInOut_toggleDout(bsp_dInOut_led_rs485_1_g);
-    // bsp_dInOut_resetDout(bsp_dInOut_led_rs485_1_y);
+
     timer_rs485_timeout[0] = BSP_RS_485_RX_TIMEOUT;
-
-  //  BSP_RS485_1.hdmarx->Instance->NDTR = BSP_RS485_1.RxXferCount;
-
-  //   uint32_t flags = 0;
-  //   flags |= __HAL_DMA_GET_FE_FLAG_INDEX(BSP_RS485_1.hdmarx);
-  //   flags |= __HAL_DMA_GET_DME_FLAG_INDEX(BSP_RS485_1.hdmarx);
-  //   flags |= __HAL_DMA_GET_TE_FLAG_INDEX(BSP_RS485_1.hdmarx);
-
-  //   __HAL_DMA_CLEAR_FLAG(BSP_RS485_1.hdmarx, flags);
 
     HAL_DMA_Abort(BSP_RS485_1.hdmarx);
 
-   // __HAL_DMA_ENABLE(BSP_RS485_1.hdmarx);
-
-  //HAL_DMA_Start(BSP_RS485_1.hdmarx, (uint32_t)&BSP_RS485_1.Instance->DR, (uint32_t)BSP_RS485_1.pRxBuffPtr, 260);
-
-    //BSP_RS485_1.Instance->CR3 |= USART_CR3_DMAR;
-
     HAL_UART_Receive_DMA(&BSP_RS485_1,BSP_RS485_1.pRxBuffPtr, 260);
 
-  }
-  else{
+    }
+    else
+    {
+      asm("NOP");
+    }
 
   }
-
-  }else if (__HAL_UART_GET_FLAG(&BSP_RS485_1, UART_FLAG_RXNE))
+  else if (__HAL_UART_GET_FLAG(&BSP_RS485_1, UART_FLAG_RXNE))
   {
     __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_RXNE);
-
-    // __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_CTS);  // OVERRUN
-    // __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_LBD);  // OVERRUN
-    // __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_TC);   // OVERRUN
-    // __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_IDLE); // OVERRUN
-
-    // // MAIN_LED1_TOGGLE();
-    // BSP_RS485_1_TIM_TIMER_STOP();
-    // BSP_RS485_1_TIM_TIMER->SR &= ~TIM_SR_UIF;
-    // BSP_RS485_1_TIM_TIMER_START();
-
-    // if (BSP_RS485_1.RxXferCount != BSP_RS485_1.hdmarx->Instance->NDTR)
-    // {
-    //   bsp_rs485_callback_rxBlockReady(1);
-    //   // bsp_dInOut_toggleDout(bsp_dInOut_led_rs485_1_g);
-    //   // bsp_dInOut_resetDout(bsp_dInOut_led_rs485_1_y);
-    //   timer_rs485_timeout[0] = BSP_RS_485_RX_TIMEOUT;
-    // }
-
-    // BSP_RS485_1.hdmarx->Instance->NDTR = BSP_RS485_1.RxXferCount;
-    // __HAL_DMA_ENABLE(BSP_RS485_1.hdmarx);
-    // BSP_RS485_1.Instance->CR3 |= USART_CR3_DMAR;
   }
-  // TRANSFER COMPLETE
-  else if (__HAL_UART_GET_FLAG(&BSP_RS485_1, UART_FLAG_TC))
+  else if (__HAL_UART_GET_FLAG(&BSP_RS485_1, UART_FLAG_TC)) // TRANSFER COMPLETE
   {
     __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_TC);
     asm("NOP");
     BSP_USART_RX_E_OFF(USART2_RX_E);
+
     if (BSP_RS485_1.hdmatx->Instance->NDTR == 0)
     {
-      // LL_GPIO_ResetOutputPin(O_D_RS485_DE_GPIO_Port,O_D_RS485_DE_Pin);
+      asm("NOP");
     }
   }
   else
   {
-    // Error_Handler();
-    // NVIC_SystemReset();
     __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_CTS);  // OVERRUN
     __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_LBD);  // OVERRUN
     __HAL_UART_CLEAR_FLAG(&BSP_RS485_1, UART_FLAG_TC);   // OVERRUN

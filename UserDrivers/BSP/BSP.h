@@ -7,8 +7,8 @@
 //-------------------- LEDS GPIO-------------
 #define BSP_LED_1                 DO_LED_GPIO_Port, DO_LED_Pin
 
-#define BSP_LED_ON(LED)			HAL_GPIO_WritePin(LED,GPIO_PIN_SET)
-#define BSP_LED_OFF(LED)	    HAL_GPIO_WritePin(LED,GPIO_PIN_RESET)
+#define BSP_LED_ON(LED)			HAL_GPIO_WritePin(LED, GPIO_PIN_SET)
+#define BSP_LED_OFF(LED)	    HAL_GPIO_WritePin(LED, GPIO_PIN_RESET)
 #define BSP_LED_TOGGLE(LED)		HAL_GPIO_TogglePin(LED)
 // //-------------------- LEDS GPIO END-------------
 

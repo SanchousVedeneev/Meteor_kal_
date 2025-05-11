@@ -6,5 +6,6 @@
 #include "BSP.h"
 
 void app_main();
+void mpu6050_init();
 
 #endif
